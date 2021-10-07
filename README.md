@@ -1,7 +1,6 @@
 # Galaksija 8-bit DIY microcomputer emulator
 
-Just another Galaksija Emulator (in C). Nothing special.
-
+Just Another Useless Galaksija Emulator in plain C.
 
 ## References
 
