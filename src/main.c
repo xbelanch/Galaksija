@@ -3,8 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-
-uint8_t memory[0x2000]; // 8k of ROM
+uint8_t memory[8192]; // 8k of ROM
 
 int dumpMemory() {
     size_t col = 0;
@@ -25,8 +24,8 @@ int dumpMemory() {
 }
 
 int loadROM(char *filename, uint32_t address) {
-    FILE *fp = fopen(filename, "rb");
-    if (fp == NULL) {
+    FILE *rom = fopen(filename, "rb");
+    if (rom == NULL) {
         perror("fopen");
         fprintf(stderr, "Error opening %s\n", filename);
         return (1);
@@ -34,18 +33,10 @@ int loadROM(char *filename, uint32_t address) {
         fprintf(stdout, "Burn %s into memory starting at address %#04x:\n", filename, address);
     }
 
-    uint8_t byte;
-    uint8_t *ptr = &memory[address];
-    while (fread(&byte, 1, sizeof(byte), fp) == 1) {
-        memcpy(ptr++, &byte, sizeof(byte));
-    }
-
-    fclose(fp);
-
+    fread(&memory[address], 1, 0x1000, rom);
+    fclose(rom);
     return (0);
 }
-
-
 
 int main(int argc, char *argv[])
 {
@@ -54,14 +45,9 @@ int main(int argc, char *argv[])
 
     fprintf(stdout, "Hello, Galaksija!\n");
     loadROM("ROM_A.BIN", 0);
-    loadROM("ROM_B.BIN", 0x1000);
-    fprintf(stdout, "%#04x ", memory[0x5]);
-    fprintf(stdout, "%#04x ", memory[0xfff]);
-    fprintf(stdout, "%#04x ", memory[0x1000]);
+    loadROM("ROM_B.BIN", 4096);
 
     dumpMemory();
 
-
-
-    return 0;
+    return (0);
 }
