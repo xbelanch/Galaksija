@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include "z80.h"
 
 uint8_t memory[8192]; // 8k of ROM
 
@@ -46,8 +47,7 @@ int main(int argc, char *argv[])
     fprintf(stdout, "Hello, Galaksija!\n");
     loadROM("ROM_A.BIN", 0);
     loadROM("ROM_B.BIN", 4096);
-
-    dumpMemory();
+    // dumpMemory();
 
     return (0);
 }
