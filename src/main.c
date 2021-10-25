@@ -59,26 +59,27 @@ int main(int argc, char *argv[])
     // dumpMemory();
 
     bool stop_emulation = 0;
-    uint32_t ticks = 0;
+    // uint32_t ticks = 0;
 
     // Some dummy register test
-    z80_reg reg = {.word = 0x11};
-    fprintf(stdout, "%#04x\n", reg.word);
-    fprintf(stdout, "%#04x\n", reg.byte.high);
-    fprintf(stdout, "%#04x\n", reg.byte.low);
-    fprintf(stdout, "%#04x\n", reg.word & Z80_C_Flag);
+    // z80_reg reg = {.word = 0x11};
+    // fprintf(stdout, "%#04x\n", reg.word);
+    // fprintf(stdout, "%#04x\n", reg.byte.high);
+    // fprintf(stdout, "%#04x\n", reg.byte.low);
+    // fprintf(stdout, "%#04x\n", reg.word & Z80_C_Flag);
 
     z80_t cpu;
     z80_init(&cpu, readByte, writeByte);
-    fprintf(stdout, "Read memory from CPU: %#02x\n", cpu.readByte(2));
+    // fprintf(stdout, "Read memory from CPU: %#02x\n", cpu.readByte(2));
 
     while (!stop_emulation) {
-        z80_exec(&cpu, ticks);
+        z80_exec(&cpu, 20);
         // emulateInterrupts();
         // emulateGraphics();
         // emulateSound();
         // emulateOtheSoftware();
         // timeSincronization();
+        stop_emulation = 1;
     }
 
     return (0);
