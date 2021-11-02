@@ -19,6 +19,12 @@
 #define Z80_Z_Flag (1<<6) // Zero
 #define Z80_S_Flag (1<<7) // Sign
 
+typedef enum {
+    NOP = 0x0,
+    SUB_A = 0x97,
+    DI = 0xf3
+} Opcode;
+
 /* extract 16-bit value from 64-bit register bank */
 // #define _G16(bank,shift) (((bank)>>(shift))&0xFFFFULL)
 
@@ -105,9 +111,9 @@ uint32_t z80_exec(z80_t* cpu, uint32_t num_ticks) {
         // fetch next opcode byte
         // fprintf(stdout, "opcode: %#02x\n", opcode);
         switch(opcode) {
-        case 0x00: fprintf(stdout, "%#02x ; ;\t\t\t%#02x\n", opcode, pc); pc++; break; // NOP
-        case 0xf3: fprintf(stdout, "%#02x: di\t\t Disable interrupts;\t\t\t%#02x\n", opcode, pc); pc++; break;
-        case 0x97: fprintf(stdout, "%#02x: sub a\t\t Clear accumulator;\t\t\t%#02x\n", opcode, pc); pc++; break;
+        case NOP: fprintf(stdout, "%#02x ; ;\t\t\t%#02x\n", opcode, pc); pc++; break; // NOP
+        case DI: fprintf(stdout, "%#02x: di\t\t Disable interrupts;\t\t\t%#02x\n", opcode, pc); pc++; break;
+        case SUB_A: fprintf(stdout, "%#02x: sub a\t\t Clear accumulator;\t\t\t%#02x\n", opcode, pc); pc++; break;
         case 0xc3:
             jptemp = pc;
             uint16_t p = jptemp;
