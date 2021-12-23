@@ -11,4 +11,4 @@ all: main
 	./main $(INPUT)
 
 main: $(OBJ)
-	$(CC) $(CFLAGS) $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
