@@ -67,10 +67,18 @@ typedef struct {
     bool halted : 1; // CPU is halted
     uint8_t interrupt_mode;
     bool interrupt_pending : 1; // Stores if there's a pending interrupt
+    uint8_t interrupt_delay;
     bool nmi_pending : 1; // Stores if there's a pending nmi
 
-    uint8_t (*readByte)(uint16_t address);
-    void (*writeByte)(uint16_t address, uint8_t data);
+    uint8_t (*readByte)(uint16_t address); // user function to read from memory
+    void (*writeByte)(uint16_t address, uint8_t data); // same for writing to memory
+    uint8_t (*port_in)(void *, uint8_t);
+    void (*port_out)(void *, uint8_t, uint8_t);
+
+    // TODO: Same for writing to port
+    void *userdata; // user costumer data (no idea what this does mean)
+
+    unsigned long cycles; // cycle count
 } z80_t;
 
 // initialize a new z80 cpu instance
@@ -78,70 +86,9 @@ void z80_init(z80_t *cpu, uint8_t (*r)(uint16_t), void (*w)(uint16_t, uint8_t));
 // reset an existing z80 cpu instance
 void z80_reset(z80_t *cpu);
 // execute instructions for at least 'ticks', but at least one, return executed ticks
-uint32_t z80_exec(z80_t* cpu, uint32_t num_ticks);
-
-void z80_init(z80_t *cpu, uint8_t (*r)(uint16_t addr), void (*w)(uint16_t addr, uint8_t byte)) {
-    cpu->pc = 0;
-    cpu->readByte = r;
-    cpu->writeByte = w;
-    cpu->af = (z80_reg) { .word = 0x0 };
-}
-
-void z80_reset(z80_t *cpu) {
-    cpu->af = (z80_reg) { .word = 0x0 };
-    cpu->bc = (z80_reg) { .word = 0x0 };
-    cpu->de = (z80_reg) { .word = 0x0 };
-    cpu->hl = (z80_reg) { .word = 0x0 };
-    cpu->ix = 0;
-    cpu->iy = 0;
-    cpu->sp = cpu->pc = 0;
-    cpu->_af = cpu->_bc = cpu->_de = cpu->_hl = (z80_reg) { .word = 0x0 };
-    cpu->i = cpu->r = 0;
-    cpu->interrupt_mode = 0;
-    cpu->halted = 0;
-}
-
-uint32_t z80_exec(z80_t* cpu, uint32_t num_ticks) {
-    uint32_t ticks = 0;
-    uint16_t pc = cpu->pc;
-    uint16_t jptemp;
-    uint8_t opcode;
-    do {
-        opcode = cpu->readByte(pc);
-        // fetch next opcode byte
-        // fprintf(stdout, "opcode: %#02x\n", opcode);
-        switch(opcode) {
-        case NOP: fprintf(stdout, "%#02x ; ;\t\t\t%#02x\n", opcode, pc); pc++; break; // NOP
-        case DI: fprintf(stdout, "%#02x: di\t\t Disable interrupts;\t\t\t%#02x\n", opcode, pc); pc++; break;
-        case SUB_A: fprintf(stdout, "%#02x: sub a\t\t Clear accumulator;\t\t\t%#02x\n", opcode, pc); pc++; break;
-        case 0xc3:
-            jptemp = pc;
-            uint16_t p = jptemp;
-            uint16_t l = cpu->readByte(++jptemp);
-            uint16_t h = cpu->readByte(++jptemp);
-            pc =  l + (h << 8);
-            fprintf(stdout, "%#02x: jp %#02x\t\t; Jump forward to START_2;\t\t\t%#02x\n", opcode, pc, p);
-            break;
-        case 0xfd:
-            fprintf(stdout, "%#02x: FD_PREFIX DONT UNDERSTAND WHAT IS HAPPENING HERE;\t\t\t%#02x\n", opcode, pc); pc++; break;
-        case 0x21:
-            fprintf(stdout, "%#02x: ld, nn; Load latch address (nn) into HL;\t\t\t%#02x\n", opcode, pc); pc++; break;
-        case 0xed: // What the hell it works?
-            fprintf(stdout, "%#02x: fetch next opcode;\t\t\t%#02x\n", opcode, pc); pc++;
-            opcode = cpu->readByte(pc);
-            switch(opcode) {
-            case 0x56: fprintf(stdout, "%#02x: im 1\t\t; Set interrupt mode 1;\t\t\t%#02x\n", opcode, pc); pc++; break;
-            default: break;
-            }
-            break;
-        default: fprintf(stdout, "%#04x: Unknow opcode\n", opcode); pc++; break;
-        }
-        // assert(false && "instruction = decode(opcode);");
-        // assert(false && "execute(instruction);");
-        ticks++;
-        // fprintf(stdout, "ticks: %d | num_ticks: %d\n", ticks, num_ticks);
-    } while (ticks < num_ticks);
-    return 0;
-}
+uint32_t z80_exec(z80_t *cpu, uint32_t num_ticks);
+// TODO: maybe this approach is better
+void z80_step(z80_t *cpu, uint8_t opcode);
+void z80_debug_output(z80_t *cpu, bool print_disassembly);
 
 #endif
