@@ -48,7 +48,28 @@ void writeByte(uint16_t address, uint8_t data) {
     memory[address] = data;
 }
 
+
+// Exploring pointers to a functions tables
+// Grabbed from https://github.com/redcode/Z80/blob/master/sources/Z80.c
+typedef uint8_t (*opcode)(char *val);
+#define INSTRUCTION(name)    uint8_t name(char *z80)
+
+INSTRUCTION(nop) { puts(z80); return 0; }
+
+static opcode const instruction_table[1] = { nop };
+
 int main(int argc, char *argv[])
+{
+    (void) argc;
+    (void) argv[0];
+    instruction_table[0]("Foo!");
+    unsigned char (*opcode)(char *) = instruction_table[0];
+    opcode("Hello!");
+
+    return (0);
+}
+
+int main2(int argc, char *argv[])
 {
     (void) argc;
     (void) argv[0];

@@ -1,6 +1,6 @@
 # Galaksija 8-bit DIY microcomputer emulator
 
-Just Another Useless Galaksija Emulator in plain C.
+Useless and unfinished Galaksija Emulator in plain C just for recreational programming.
 
 ## References
 
@@ -15,4 +15,5 @@ Just Another Useless Galaksija Emulator in plain C.
 ### Emulation in general
 
 - [chips](https://github.com/floooh/chips): A toolbox of 8-bit chip-emulators, helper code and complete embeddable system emulators in dependency-free C headers (a subset of C99 that compiles on gcc, clang and cl.exe).
+- [Redcode's Z80](https://github.com/redcode/Z80): The Z80 library implements a fast, small and accurate emulator of the Zilog Z80.
 - [superzazu/8080](https://github.com/superzazu/8080): A complete emulation of the Intel 8080 processor written in C99.
